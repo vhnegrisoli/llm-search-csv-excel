@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from llm import LLMIntegration
 from prompts import USER_PROMPT, PANDAS_COMMAND_PROMPT
 from pandas_processor import PandasOutputProcessor
+from dataframe_info_builder import DataframeInfoBuilder
 
 
 load_dotenv()
@@ -15,12 +16,13 @@ df = pd.read_csv('files/data.csv', encoding='utf-8', delimiter=';')
 
 llm = LLMIntegration()
 
-df_info = df.info()
-df_describe = df.describe()
 request = USER_PROMPT
 image_id = uuid4()
-prompt = PANDAS_COMMAND_PROMPT.format(image_id, df_info, df_describe)
 
+dataframe_infos = DataframeInfoBuilder(df=df).build_df_info()
+prompt = PANDAS_COMMAND_PROMPT.format(image_id, dataframe_infos)
+
+print(f'System prompt: \n{prompt}')
 messages = [
     SystemMessage(content=prompt),
     HumanMessage(content=USER_PROMPT)
@@ -28,10 +30,6 @@ messages = [
 
 response = llm.call_llm(messages)
 content = response.content
-usage = response.usage
-
-print(f'LLM response:\n\n{content}\nUsage: \n')
-print(f'Input: {usage.input_tokens}\nOutput: {usage.output_tokens}\nTotal: {usage.total_tokens}\n')
 
 processor = PandasOutputProcessor(json_output=content)
 processor.process()

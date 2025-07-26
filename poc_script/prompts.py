@@ -1,5 +1,6 @@
 USER_PROMPT = """
-Me dê a soma total de valor de vendas e a média
+Me dê uma tabela que informe o nome do produto e o valor de vendas e o mês e o ano. Mês e ano em ordem decrescente.
+Formate o mês para o nome: Janeiro, Fevereiro...
 """
 
 PANDAS_COMMAND_PROMPT = """
@@ -23,16 +24,13 @@ PANDAS_COMMAND_PROMPT = """
     - I already have a Pandas, Seaborn and Matplotlib script, so you do not need to import anything.
     - Do no use plt.show() command. I only need to save the image (if result is image)
     - NEVER generate variable declaration in the command. Only the command without 'variable = command'
-    - If command is for text type, always convert the Dataframe or Series to string at the and of the command. Use .to_string(index=False)
+        * Example, never return "sales_sum = df['SALES'].sum()", return only "df['SALES'].sum()".
     
-    Dataframe info: 
+    Dataframe infos: 
     
     {1}
-
-    Datafrime statistical describe:
-    
-    {2}
 """
+
 PANDAS_OUTPUT_FORMATTER_PROMPT = """
         Format Pandas response for user.
         - Use Markdown for better formatting

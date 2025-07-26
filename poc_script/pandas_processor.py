@@ -50,12 +50,7 @@ class PandasOutputProcessor:
             llm = LLMIntegration()
             user_input = USER_PROMPT
             prompt = PANDAS_OUTPUT_FORMATTER_PROMPT.format(user_input, pandas_output)
-            print(f'Format LLM prompt: \n{prompt}\n')
-            response = llm.call_llm([HumanMessage(content=prompt)])
-            content = response.content
-            usage = response.usage
-            print(f'LLM response:\n\n{content}\nUsage: \n')
-            print(f'Input: {usage.input_tokens}\nOutput: {usage.output_tokens}\nTotal: {usage.total_tokens}\n')
+            llm.call_llm([HumanMessage(content=prompt)])
         else:
             for command in commands:
                 eval(command, {"__builtins__": {}}, local_vars)

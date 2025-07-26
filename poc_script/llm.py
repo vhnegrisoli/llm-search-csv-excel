@@ -37,7 +37,7 @@ class LLMIntegration:
         usage = response.response_metadata.get("token_usage", None)
         input = usage.get('prompt_tokens', 0)
         output = usage.get('completion_tokens', 0)
-        return LLMResponse(
+        llm_response = LLMResponse(
             content=content,
             usage=LLMUsageResponse(
                 input_tokens=input,
@@ -45,3 +45,13 @@ class LLMIntegration:
                 total_tokens=input+output
             )
         )
+        self._log_response(response=llm_response)
+        return llm_response
+    
+    def _log_response(self, response: LLMResponse) -> None:
+        content = response.content
+        usage = response.usage
+        print(f'LLM response:\n\n{content}\nUsage: ')
+        print(f'Input: {usage.input_tokens}')
+        print(f'Output: {usage.output_tokens}')
+        print(f'Total: {usage.total_tokens}')
