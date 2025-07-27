@@ -8,7 +8,8 @@ UPLOAD_PLOTS_DIR = 'files/plots'
 
 class QueryRequest(BaseModel):
     query: str
-    file_path: str
+    file_name: str
+    file_delimiter: str
 
 
 class FileUploadResponse(BaseModel):

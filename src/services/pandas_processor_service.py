@@ -1,33 +1,36 @@
 import io
 import sys
-from langchain_core.messages import HumanMessage
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
-from llm import LLMIntegration
-from src.llm.prompts import USER_PROMPT, PANDAS_OUTPUT_FORMATTER_PROMPT
+from src.llm.prompts import PANDAS_OUTPUT_FORMATTER_PROMPT
+from src.models.endpoint import QueryRequest
 from src.models.dataframe import DataframeResponse, DataframeType
+from src.services.llm_service import LLMService
 import json
 
 
 class PandasProcessorService:
 
-    def __init__(self, json_output: str):
-        self._json_output = self._parse_output(json_output=json_output)
-        self._result = json.loads(self._json_output)
-        self._data = DataframeResponse(**self._result)
-        self._df = pd.read_csv('files/data.csv', encoding='utf-8', delimiter=';')
+    def __init__(self, df: pd.DataFrame, request: QueryRequest):
+        self._df = df
+        self._request = request
+        self._llm_service = LLMService()
+        self._result = None
+        self._data = None
 
     def _parse_output(self, json_output: str) -> dict:
         json_output = json_output.replace('```json', '')
         json_output = json_output.replace('```', '')
-        return json_output
-
-    def process(self) -> None:
-        data = self._data
         
-        command_type = data.type
-        commands = data.commands
+        self._result = json.loads(json_output)
+        self._data = DataframeResponse(**self._result)
+        
+    def process(self, json_output: str) -> None:
+        self._parse_output(json_output=json_output)
+
+        command_type = self._data.type
+        commands = self._data.commands
 
         local_vars = {'df': self._df, 'pd': pd, 'plt': plt, 'sns': sns}
 
@@ -49,10 +52,9 @@ class PandasProcessorService:
             
             print(f'\nPandas output: {pandas_output}\n')
 
-            llm = LLMIntegration()
-            user_input = USER_PROMPT
+            user_input = self._request.query
             prompt = PANDAS_OUTPUT_FORMATTER_PROMPT.format(user_input, pandas_output)
-            llm.call_llm([HumanMessage(content=prompt)])
+            self._llm_service.call_llm_user(user_prompt=prompt)
         else:
             for command in commands:
                 exec(command, local_vars)

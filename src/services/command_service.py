@@ -1,35 +1,49 @@
-from langchain_core.messages import SystemMessage, HumanMessage
 import pandas as pd
 from uuid import uuid4
-import os
-from dotenv import load_dotenv
-from llm import LLMIntegration
-from prompts import USER_PROMPT, PANDAS_COMMAND_PROMPT
-from pandas_processor import PandasOutputProcessor
-from dataframe_info_builder import DataframeInfoBuilder
+import io
+from src.utils.file_utils import FileUtils
+from src.models.endpoint import QueryRequest
+from src.models.endpoint import UPLOAD_INPUT_DIR
+from src.llm.prompts import PANDAS_COMMAND_PROMPT
+from src.services.pandas_processor_service import PandasProcessorService
+from src.services.llm_service import LLMService
+from src.services.dataframe_info_service import DataframeInfoService
 
 
-load_dotenv()
+CSV = 'csv'
 
 
-df = pd.read_csv('files/data.csv', encoding='utf-8', delimiter=';')
+class CommandService:
 
-llm = LLMIntegration()
+    def __init__(self, request: QueryRequest):
+        self._request = request
+        self._df = self._create_dataframe()
+        self._llm_service = LLMService()
+        self._dataframe_info_service = DataframeInfoService(df=self._df)
+        self._pandas_processor_service = PandasProcessorService(df=self._df, request=request)
 
-request = USER_PROMPT
-image_id = uuid4()
+    def _create_dataframe(self) -> pd.DataFrame:
+        ext = FileUtils.get_file_extension(self._request.file_name)
+        file_path = f'{UPLOAD_INPUT_DIR}/{self._request.file_name}'
+        if CSV == ext:
+            delimiter = self._request.file_delimiter
+            return pd.read_csv(file_path, encoding='utf-8', delimiter=delimiter)
+        else:
+            return pd.read_excel(file_path, encoding='utf-8')
+    
+    def create_commands(self) -> None:
+        image_id = uuid4()
 
-dataframe_infos = DataframeInfoBuilder(df=df).build_df_info()
-prompt = PANDAS_COMMAND_PROMPT.format(image_id, dataframe_infos)
+        dataframe_infos = self._dataframe_info_service.build_df_info()
+        prompt = PANDAS_COMMAND_PROMPT.format(image_id, dataframe_infos)
 
-print(f'System prompt: \n{prompt}')
-messages = [
-    SystemMessage(content=prompt),
-    HumanMessage(content=USER_PROMPT)
-]
+        print(f'System prompt: \n{prompt}')
 
-response = llm.call_llm(messages)
-content = response.content
+        response = self._llm_service.call_llm(
+            system_prompt=prompt,
+            user_prompt=self._request.query
+        )
 
-processor = PandasOutputProcessor(json_output=content)
-processor.process()
+        content = response.content
+
+        self._pandas_processor_service.process(json_output=content)

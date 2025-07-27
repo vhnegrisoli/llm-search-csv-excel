@@ -1,7 +1,3 @@
-USER_PROMPT = """
-Me dê uma tabela que informe o nome do produto e o valor de vendas e o mês e o ano. Mês e ano em ordem decrescente.
-"""
-
 USER_INTENTION_PROMPT = """
     You are a User Intention AI Agent.
 

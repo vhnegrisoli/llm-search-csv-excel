@@ -1,21 +1,22 @@
 from fastapi import APIRouter, status, HTTPException
 from src.models.endpoint import QueryRequest
 from src.models.llm_models import LLMResponse
-
+from src.services.command_service import CommandService
 
 router = APIRouter()
 
 
-@router.post("/search", response_model=LLMResponse)
-def query_rag(request: QueryRequest) -> dict:
+@router.post("/search")
+def search_csv_excel(request: QueryRequest) -> dict:
 
-    service = RagService()
-    response = service.query_rag(request=request)
-
-    if "error" in response:
+    service = CommandService(request=request)
+    
+    try:
+        service.create_commands()
+    except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=response["error"]
+            detail=str(ex)
         )
 
-    return response
+    return {'status': 'OK'}

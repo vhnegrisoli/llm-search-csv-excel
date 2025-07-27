@@ -1,8 +1,7 @@
-import pandas as pd
 import io
+import pandas as pd
 
-
-class DataframeInfoBuilder:
+class DataframeInfoService:
 
     def __init__(self, df: pd.DataFrame):
         self._df = df

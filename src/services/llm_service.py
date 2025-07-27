@@ -21,7 +21,7 @@ class LLMService:
         ]
         return self._llm.call_llm(messages=messages)
 
-    def call_llm_llm(self, user_prompt: str) -> LLMResponse:
+    def call_llm_user(self, user_prompt: str) -> LLMResponse:
         messages = [
             HumanMessage(content=user_prompt)
         ]
