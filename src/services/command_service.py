@@ -31,8 +31,8 @@ class CommandService:
         else:
             return pd.read_excel(file_path, encoding='utf-8')
     
-    def create_commands(self) -> None:
-        image_id = uuid4()
+    def create_commands(self) -> dict:
+        image_id = str(uuid4())
 
         dataframe_infos = self._dataframe_info_service.build_df_info()
         prompt = PANDAS_COMMAND_PROMPT.format(image_id, dataframe_infos)
@@ -45,5 +45,23 @@ class CommandService:
         )
 
         content = response.content
+        command_usage = response.usage
 
-        self._pandas_processor_service.process(json_output=content)
+        pandas_response = self._pandas_processor_service.process(
+            json_output=content,
+            image_id=image_id
+        )
+
+        pandas_usage = pandas_response.llm_response.usage
+
+        return {
+            'image_path': pandas_response.image_path,
+            'pandas_commands': pandas_response.pandas_commands,
+            'pandas_output': pandas_response.pandas_output,
+            'llm_output': pandas_response.llm_response.content,
+            'usage': {
+                'input_tokens': command_usage.input_tokens + pandas_usage.input_tokens,
+                'output_tokens': command_usage.output_tokens + pandas_usage.output_tokens,
+                'total_tokens': command_usage.total_tokens + pandas_usage.total_tokens
+            }
+        }

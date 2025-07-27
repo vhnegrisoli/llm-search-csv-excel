@@ -4,8 +4,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
 from src.llm.prompts import PANDAS_OUTPUT_FORMATTER_PROMPT
-from src.models.endpoint import QueryRequest
-from src.models.dataframe import DataframeResponse, DataframeType
+from src.models.llm_models import LLMResponse, LLMUsageResponse
+from src.models.endpoint import QueryRequest, UPLOAD_PLOTS_DIR
+from src.models.dataframe import DataframeResponse, DataframeType, PandasResponse
 from src.services.llm_service import LLMService
 import json
 
@@ -26,7 +27,7 @@ class PandasProcessorService:
         self._result = json.loads(json_output)
         self._data = DataframeResponse(**self._result)
         
-    def process(self, json_output: str) -> None:
+    def process(self, json_output: str, image_id: str) -> PandasResponse:
         self._parse_output(json_output=json_output)
 
         command_type = self._data.type
@@ -54,7 +55,20 @@ class PandasProcessorService:
 
             user_input = self._request.query
             prompt = PANDAS_OUTPUT_FORMATTER_PROMPT.format(user_input, pandas_output)
-            self._llm_service.call_llm_user(user_prompt=prompt)
+            llm_response = self._llm_service.call_llm_user(user_prompt=prompt)
+
+            return PandasResponse(
+                pandas_commands=commands,
+                pandas_output=pandas_output,
+                llm_response=llm_response
+            )
         else:
             for command in commands:
                 exec(command, local_vars)
+            return PandasResponse(
+                pandas_commands=commands,
+                image_path=f'{UPLOAD_PLOTS_DIR}/{image_id}.png',
+                llm_response=LLMResponse(
+                    content=''
+                )
+            )

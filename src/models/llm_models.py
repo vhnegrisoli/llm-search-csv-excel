@@ -10,4 +10,4 @@ class LLMUsageResponse(BaseModel):
 
 class LLMResponse(BaseModel):
     content: str
-    usage: Optional[LLMUsageResponse] = None
+    usage: Optional[LLMUsageResponse] = LLMUsageResponse()

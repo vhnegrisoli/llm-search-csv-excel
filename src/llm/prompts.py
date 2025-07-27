@@ -43,7 +43,7 @@ PANDAS_COMMAND_PROMPT = """
 
     - If the command is to plot a chart, give the commands to plot and save image.
     - For plotting, use only Matplotlib, Seaborn or Pandas. No other lib.
-    - For saving images, use the following path: 'files/generated/{0}.png'
+    - For saving images, use the following path: 'files/plots/{0}.png'
     - I already have a Pandas, Seaborn and Matplotlib imported script, so you do not need to import them.
     - Do no use plt.show() command. I only need to save the image (if result is image)
     - If there's a command that is a code block (if or for statement), generate the whole code block
