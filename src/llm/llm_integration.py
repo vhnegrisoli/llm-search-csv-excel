@@ -4,20 +4,9 @@ from pydantic import BaseModel
 from typing import List, Optional
 from dotenv import load_dotenv
 import os
-
+from src.models.llm_models import LLMResponse, LLMUsageResponse
 
 load_dotenv()
-
-
-class LLMUsageResponse(BaseModel):
-    input_tokens: int = 0
-    output_tokens: int = 0
-    total_tokens: int = 0
-
-
-class LLMResponse(BaseModel):
-    content: str
-    usage: Optional[LLMUsageResponse] = None
 
 
 class LLMIntegration:
@@ -27,8 +16,8 @@ class LLMIntegration:
         self._key = os.getenv('OPENAI_KEY', '')
         self._llm = ChatOpenAI(
             temperature=0,
-            model=os.getenv('OPENAI_MODEL', ''),
-            api_key=os.getenv('OPENAI_KEY', '')
+            model=self._model,
+            api_key=self._key
         )
     
     def call_llm(self, messages: List[BaseMessage]) -> LLMResponse:
