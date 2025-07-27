@@ -1,9 +1,11 @@
 import pandas as pd
 from uuid import uuid4
-import io
+import json
 from src.utils.file_utils import FileUtils
+from src.models.llm_models import LLMUsageResponse
 from src.models.endpoint import QueryRequest
 from src.models.endpoint import UPLOAD_INPUT_DIR
+from src.models.dataframe import PandasResponse, DataframeResponse
 from src.llm.prompts import PANDAS_COMMAND_PROMPT
 from src.services.pandas_processor_service import PandasProcessorService
 from src.services.llm_service import LLMService
@@ -45,18 +47,45 @@ class CommandService:
         )
 
         content = response.content
+        df_response = self._parse_output(json_output=content)
         command_usage = response.usage
-
-        pandas_response = self._pandas_processor_service.process(
-            json_output=content,
-            image_id=image_id
-        )
+        
+        try:
+            pandas_response = self._pandas_processor_service.process(
+                df_response=df_response,
+                image_id=image_id
+            )
+        except Exception as ex:
+            return self._build_error_output(
+                error_msg=str(ex),
+                df_response=df_response,
+                usage=response.usage
+            )
 
         pandas_usage = pandas_response.llm_response.usage
 
+        return self._build_success_output(
+            pandas_response=pandas_response,
+            df_response=df_response,
+            command_usage=command_usage,
+            pandas_usage=pandas_usage
+        )
+
+    def _parse_output(self, json_output: str) -> DataframeResponse:
+        json_output = json_output.replace('```json', '')
+        json_output = json_output.replace('```', '')
+        
+        self._result = json.loads(json_output)
+        return DataframeResponse(**self._result)
+    
+    def _build_success_output(self,
+                              pandas_response: PandasResponse,
+                              df_response: DataframeResponse,
+                              command_usage: LLMUsageResponse,
+                              pandas_usage: LLMUsageResponse) -> dict:
         return {
             'image_path': pandas_response.image_path,
-            'pandas_commands': pandas_response.pandas_commands,
+            'pandas_commands': df_response.commands,
             'pandas_output': pandas_response.pandas_output,
             'llm_output': pandas_response.llm_response.content,
             'usage': {
@@ -64,4 +93,14 @@ class CommandService:
                 'output_tokens': command_usage.output_tokens + pandas_usage.output_tokens,
                 'total_tokens': command_usage.total_tokens + pandas_usage.total_tokens
             }
+        }
+
+    def _build_error_output(self,
+                            error_msg: str,
+                            df_response: DataframeResponse,
+                            usage: LLMUsageResponse) -> dict:
+        return {
+            'pandas_commands': df_response.commands,
+            'error_msg': error_msg,
+            'usage': usage.model_dump()
         }

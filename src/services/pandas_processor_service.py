@@ -20,18 +20,9 @@ class PandasProcessorService:
         self._result = None
         self._data = None
 
-    def _parse_output(self, json_output: str) -> dict:
-        json_output = json_output.replace('```json', '')
-        json_output = json_output.replace('```', '')
-        
-        self._result = json.loads(json_output)
-        self._data = DataframeResponse(**self._result)
-        
-    def process(self, json_output: str, image_id: str) -> PandasResponse:
-        self._parse_output(json_output=json_output)
-
-        command_type = self._data.type
-        commands = self._data.commands
+    def process(self, df_response: DataframeResponse, image_id: str) -> PandasResponse:
+        command_type = df_response.type
+        commands = df_response.commands
 
         local_vars = {'df': self._df, 'pd': pd, 'plt': plt, 'sns': sns}
 

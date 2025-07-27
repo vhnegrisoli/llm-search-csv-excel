@@ -20,6 +20,7 @@ class QueryResponse(BaseModel):
     pandas_output: Optional[Any] = None
     llm_output: Optional[str] = None
     usage: Optional[LLMUsageResponse] = None
+    error_msg: Optional[str] = None
 
 
 class FileUploadResponse(BaseModel):
