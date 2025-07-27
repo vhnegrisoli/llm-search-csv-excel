@@ -131,10 +131,7 @@ Este projeto está licenciado sob a licença [MIT](LICENSE).
 
 ---
 
-## ✉️ Contato
+## ✍️ Autor
 
-Victor Hugo Negrisoli
-[LinkedIn](https://www.linkedin.com/in/seu-perfil) • [Email](mailto:seu@email.com)
-
-```
-```
+**Victor Hugo Negrisoli**
+🔗 [LinkedIn](https://www.linkedin.com/in/victorhugonegrisoli/) | 🐙 [GitHub](https://github.com/vhnegrisoli/)
