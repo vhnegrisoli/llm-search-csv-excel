@@ -1,28 +1,16 @@
 import io
 import sys
 from langchain_core.messages import HumanMessage
-from pydantic import BaseModel
-from enum import Enum
-from typing import List
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
 from llm import LLMIntegration
-from prompts import USER_PROMPT, PANDAS_OUTPUT_FORMATTER_PROMPT
+from src.llm.prompts import USER_PROMPT, PANDAS_OUTPUT_FORMATTER_PROMPT
+from src.models.dataframe import DataframeResponse, DataframeType
 import json
 
 
-class DataframeType(Enum):
-    TEXT = 'TEXT'
-    IMAGE = 'IMAGE'
-
-
-class DataframeResponse(BaseModel):
-    type: DataframeType
-    commands: List[str]
-
-
-class PandasOutputProcessor:
+class PandasProcessorService:
 
     def __init__(self, json_output: str):
         self._json_output = self._parse_output(json_output=json_output)
