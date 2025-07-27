@@ -57,11 +57,42 @@ Executa uma consulta em uma planilha já enviada, interpretando a requisição c
 }
 ```
 
-**Resposta esperada:**
+**Resposta esperada de sucesso:**
 
 ```json
 {
-  "status": "OK"
+  "image_path": null,
+  "pandas_commands": [
+    "df[(df['YEAR_ID'] == 2003) & (df['MONTH_ID'] == 5)]['SALES'].mean()"
+  ],
+  "pandas_output": 198790.3448275862,
+  "llm_output": "A média de vendas em 2003 e no mês de Maio é **198790.34**.",
+  "usage": {
+    "input_tokens": 1987,
+    "output_tokens": 69,
+    "total_tokens": 2056
+  },
+  "error_msg": null
+}
+```
+
+**Resposta esperada de falha:**
+
+```json
+{
+  "image_path": null,
+  "pandas_commands": [
+    "monthly_sales = df[df['YEAR_ID'] == 2003].groupby(['MONTH_ID', 'PRODUCTLINE'])['SALES'].mean().unstack()",
+    "import seaborn as sns; import matplotlib.pyplot as plt; ax = monthly_sales.plot(kind='bar', figsize=(12, 6)); ax.set_title('Média de Vendas por Mês e Produto em 2003'); ax.set_xlabel('Mês'); ax.set_ylabel('Média de Vendas'); for p in ax.patches: ax.annotate(round(p.get_height(), 2), (p.get_x() + p.get_width() / 2., p.get_height()), ha='center', va='bottom'); plt.savefig('files/plots/c14f9957-df44-4531-b1dc-2c96c174efae.png')"
+  ],
+  "pandas_output": null,
+  "llm_output": null,
+  "usage": {
+    "input_tokens": 1917,
+    "output_tokens": 193,
+    "total_tokens": 2110
+  },
+  "error_msg": "invalid syntax (<string>, line 1)"
 }
 ```
 
