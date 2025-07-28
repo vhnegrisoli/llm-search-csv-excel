@@ -1,12 +1,12 @@
 from langchain_core.messages import SystemMessage, HumanMessage
 from src.llm.llm_integration import LLMIntegration
-from src.models.llm_models import LLMResponse
+from src.models.llm_models import LLMProvider, LLMResponse
 
 
 class LLMService:
 
-    def __init__(self):
-        self._llm = LLMIntegration()
+    def __init__(self, provider: LLMProvider):
+        self._llm = LLMIntegration(provider=provider)
 
     def call_llm(self, system_prompt: str, user_prompt: str) -> LLMResponse:
         messages = [

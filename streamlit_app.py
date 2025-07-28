@@ -39,7 +39,8 @@ if "file_name" in st.session_state:
         payload = {
             "query": query,
             "file_name": st.session_state["file_name"],
-            "file_delimiter": st.session_state["file_delimiter"]
+            "file_delimiter": st.session_state["file_delimiter"],
+            "provider": "AZURE_OPENAI"
         }
 
         with st.spinner("Consultando IA..."):

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from src.models.llm_models import LLMUsageResponse
+from src.models.llm_models import LLMUsageResponse, LLMProvider
 from typing import Any, Optional, List
 
 
@@ -12,6 +12,7 @@ class QueryRequest(BaseModel):
     query: str
     file_name: str
     file_delimiter: str
+    provider: Optional[LLMProvider] = LLMProvider.OPENAI
 
 
 class QueryResponse(BaseModel):

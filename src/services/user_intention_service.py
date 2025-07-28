@@ -1,3 +1,4 @@
+from src.models.llm_models import LLMProvider
 from src.services.llm_service import LLMService
 from src.models.dataframe import DataframeType
 from src.llm.prompts import USER_INTENTION_PROMPT
@@ -5,8 +6,8 @@ from src.llm.prompts import USER_INTENTION_PROMPT
 
 class UserIntentionService:
 
-    def __init__(self):
-        self._llm_service = LLMService()
+    def __init__(self, provider: LLMProvider):
+        self._llm_service = LLMService(provider=provider)
 
     def define_user_input(self, user_input: str) -> DataframeType:
         response = self._llm_service.call_llm(

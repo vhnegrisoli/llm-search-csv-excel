@@ -13,3 +13,4 @@ seaborn==0.13.2
 python-multipart==0.0.20
 streamlit==1.47.1
 requests==2.32.4
+openpyxl==3.1.5

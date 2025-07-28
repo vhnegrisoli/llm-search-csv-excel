@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from enum import Enum
 
 
 class LLMUsageResponse(BaseModel):
@@ -11,3 +12,8 @@ class LLMUsageResponse(BaseModel):
 class LLMResponse(BaseModel):
     content: str
     usage: Optional[LLMUsageResponse] = LLMUsageResponse()
+
+
+class LLMProvider(Enum):
+    OPENAI = "OPENAI"
+    AZURE_OPENAI = "AZURE_OPENAI"

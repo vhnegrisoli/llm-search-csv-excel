@@ -21,8 +21,8 @@ class CommandService:
     def __init__(self, request: QueryRequest):
         self._request = request
         self._df = self._create_dataframe()
-        self._llm_service = LLMService()
-        self._user_intention_service = UserIntentionService()
+        self._llm_service = LLMService(provider=request.provider)
+        self._user_intention_service = UserIntentionService(provider=request.provider)
         self._dataframe_info_service = DataframeInfoService(df=self._df)
         self._pandas_processor_service = PandasProcessorService(df=self._df, request=request)
 
@@ -33,7 +33,7 @@ class CommandService:
             delimiter = self._request.file_delimiter
             return pd.read_csv(file_path, encoding='utf-8', delimiter=delimiter)
         else:
-            return pd.read_excel(file_path, encoding='utf-8')
+            return pd.read_excel(file_path)
     
     def create_commands(self) -> dict:
         user_input = self._request.query

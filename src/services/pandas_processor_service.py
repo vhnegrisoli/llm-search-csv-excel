@@ -15,7 +15,7 @@ class PandasProcessorService:
     def __init__(self, df: pd.DataFrame, request: QueryRequest):
         self._df = df
         self._request = request
-        self._llm_service = LLMService()
+        self._llm_service = LLMService(request.provider)
         self._local_vars = {'df': self._df, 'pd': pd, 'plt': plt, 'sns': sns}
         self._result = None
         self._data = None
@@ -34,7 +34,7 @@ class PandasProcessorService:
         for i, command in enumerate(commands, start=1):
             try:
                 if self._is_expression(command):
-                    result =eval(command, {"__builtins__": {}}, self._local_vars)
+                    result = eval(command, {"__builtins__": {}}, self._local_vars)
                     results.append(f"Pandas output {i}: {result}")
                 else:
                     exec(command, self._local_vars)
@@ -54,7 +54,7 @@ class PandasProcessorService:
             pandas_output=pandas_output,
             llm_response=llm_response
         )
-    
+
     def _process_image_output(self, commands: List[str], image_id: str) -> PandasResponse:
         for command in commands:
             exec(command, self._local_vars)
@@ -62,7 +62,7 @@ class PandasProcessorService:
             pandas_commands=commands,
             image_path=f'{UPLOAD_PLOTS_DIR}/{image_id}.png',
             llm_response=LLMResponse(
-            content=''
+                content=''
             )
         )
 
@@ -70,5 +70,5 @@ class PandasProcessorService:
         try:
             parsed = ast.parse(command)
             return isinstance(parsed.body[0], ast.Expr)
-        except:
+        except Exception:
             return False
