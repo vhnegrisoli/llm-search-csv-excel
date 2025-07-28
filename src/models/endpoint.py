@@ -15,6 +15,7 @@ class QueryRequest(BaseModel):
 
 
 class QueryResponse(BaseModel):
+    type: Optional[str] = None
     image_path: Optional[str] = None
     pandas_commands: List[str] = []
     pandas_output: Optional[Any] = None

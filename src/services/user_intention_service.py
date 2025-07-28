@@ -3,7 +3,7 @@ from src.models.dataframe import DataframeType
 from src.llm.prompts import USER_INTENTION_PROMPT
 
 
-class UserIntention:
+class UserIntentionService:
 
     def __init__(self):
         self._llm_service = LLMService()

@@ -1,5 +1,5 @@
-import io
-import sys
+import ast
+from typing import List
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -8,7 +8,6 @@ from src.models.llm_models import LLMResponse, LLMUsageResponse
 from src.models.endpoint import QueryRequest, UPLOAD_PLOTS_DIR
 from src.models.dataframe import DataframeResponse, DataframeType, PandasResponse
 from src.services.llm_service import LLMService
-import json
 
 
 class PandasProcessorService:
@@ -17,6 +16,7 @@ class PandasProcessorService:
         self._df = df
         self._request = request
         self._llm_service = LLMService()
+        self._local_vars = {'df': self._df, 'pd': pd, 'plt': plt, 'sns': sns}
         self._result = None
         self._data = None
 
@@ -24,42 +24,51 @@ class PandasProcessorService:
         command_type = df_response.type
         commands = df_response.commands
 
-        local_vars = {'df': self._df, 'pd': pd, 'plt': plt, 'sns': sns}
-
         if DataframeType.TEXT == command_type:
-            
-            for command in commands:
-                buffer = io.StringIO()
-                sys_stdout_original = sys.stdout
-                sys.stdout = buffer
-                try:
-                    exec(command, local_vars)
-                finally:
-                    sys.stdout = sys_stdout_original
-                output = buffer.getvalue()
-                print("Capturado:", output)
-
-            command = commands[0]
-            pandas_output = eval(command, {"__builtins__": {}}, local_vars)
-            
-            print(f'\nPandas output: {pandas_output}\n')
-
-            user_input = self._request.query
-            prompt = PANDAS_OUTPUT_FORMATTER_PROMPT.format(user_input, pandas_output)
-            llm_response = self._llm_service.call_llm_user(user_prompt=prompt)
-
-            return PandasResponse(
-                pandas_commands=commands,
-                pandas_output=pandas_output,
-                llm_response=llm_response
-            )
+            return self._process_text_output(commands=commands)
         else:
-            for command in commands:
-                exec(command, local_vars)
-            return PandasResponse(
-                pandas_commands=commands,
-                image_path=f'{UPLOAD_PLOTS_DIR}/{image_id}.png',
-                llm_response=LLMResponse(
-                    content=''
-                )
+            return self._process_image_output(commands=commands, image_id=image_id)
+        
+    def _process_text_output(self, commands: List[str]) -> PandasResponse:
+        results = []
+        for i, command in enumerate(commands, start=1):
+            try:
+                if self._is_expression(command):
+                    result =eval(command, {"__builtins__": {}}, self._local_vars)
+                    results.append(f"Pandas output {i}: {result}")
+                else:
+                    exec(command, self._local_vars)
+            except Exception as ex:
+                results.append(f"{command} = ERROR: {ex}")
+
+        pandas_output = "\n".join(results)
+
+        print(f'\nPandas output: {pandas_output}\n')
+
+        user_input = self._request.query
+        prompt = PANDAS_OUTPUT_FORMATTER_PROMPT.format(user_input, pandas_output)
+        llm_response = self._llm_service.call_llm_user(user_prompt=prompt)
+
+        return PandasResponse(
+            pandas_commands=commands,
+            pandas_output=pandas_output,
+            llm_response=llm_response
+        )
+    
+    def _process_image_output(self, commands: List[str], image_id: str) -> PandasResponse:
+        for command in commands:
+            exec(command, self._local_vars)
+        return PandasResponse(
+            pandas_commands=commands,
+            image_path=f'{UPLOAD_PLOTS_DIR}/{image_id}.png',
+            llm_response=LLMResponse(
+            content=''
             )
+        )
+
+    def _is_expression(self, command: str) -> bool:
+        try:
+            parsed = ast.parse(command)
+            return isinstance(parsed.body[0], ast.Expr)
+        except:
+            return False

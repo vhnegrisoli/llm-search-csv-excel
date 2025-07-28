@@ -5,11 +5,12 @@ from src.utils.file_utils import FileUtils
 from src.models.llm_models import LLMUsageResponse
 from src.models.endpoint import QueryRequest
 from src.models.endpoint import UPLOAD_INPUT_DIR
-from src.models.dataframe import PandasResponse, DataframeResponse
-from src.llm.prompts import PANDAS_COMMAND_PROMPT
+from src.models.dataframe import PandasResponse, DataframeResponse, DataframeType
+from src.llm.prompts import PANDAS_IMAGE_COMMAND_PROMPT, PANDAS_TEXT_COMMAND_PROMPT
 from src.services.pandas_processor_service import PandasProcessorService
 from src.services.llm_service import LLMService
 from src.services.dataframe_info_service import DataframeInfoService
+from src.services.user_intention_service import UserIntentionService
 
 
 CSV = 'csv'
@@ -21,6 +22,7 @@ class CommandService:
         self._request = request
         self._df = self._create_dataframe()
         self._llm_service = LLMService()
+        self._user_intention_service = UserIntentionService()
         self._dataframe_info_service = DataframeInfoService(df=self._df)
         self._pandas_processor_service = PandasProcessorService(df=self._df, request=request)
 
@@ -34,20 +36,23 @@ class CommandService:
             return pd.read_excel(file_path, encoding='utf-8')
     
     def create_commands(self) -> dict:
+        user_input = self._request.query
         image_id = str(uuid4())
-
         dataframe_infos = self._dataframe_info_service.build_df_info()
-        prompt = PANDAS_COMMAND_PROMPT.format(image_id, dataframe_infos)
-
-        print(f'System prompt: \n{prompt}')
-
+        df_type = self._user_intention_service.define_user_input(user_input=user_input)
+        
+        prompt = self._define_command_prompt(
+            df_type=df_type,
+            image_id=image_id,
+            dataframe_infos=dataframe_infos
+        )
+    
         response = self._llm_service.call_llm(
             system_prompt=prompt,
-            user_prompt=self._request.query
+            user_prompt=user_input
         )
 
-        content = response.content
-        df_response = self._parse_output(json_output=content)
+        df_response = self._parse_output(json_output=response.content)
         command_usage = response.usage
         
         try:
@@ -71,6 +76,17 @@ class CommandService:
             pandas_usage=pandas_usage
         )
 
+    def _define_command_prompt(self,
+                               df_type: DataframeType,
+                               image_id: str,
+                               dataframe_infos: str) -> str:
+        prompt = ''
+        if DataframeType.TEXT == df_type:
+            prompt = PANDAS_TEXT_COMMAND_PROMPT
+        else:
+            prompt = PANDAS_IMAGE_COMMAND_PROMPT
+        return prompt.format(image_id, dataframe_infos)        
+
     def _parse_output(self, json_output: str) -> DataframeResponse:
         json_output = json_output.replace('```json', '')
         json_output = json_output.replace('```', '')
@@ -84,6 +100,7 @@ class CommandService:
                               command_usage: LLMUsageResponse,
                               pandas_usage: LLMUsageResponse) -> dict:
         return {
+            'type': df_response.type,
             'image_path': pandas_response.image_path,
             'pandas_commands': df_response.commands,
             'pandas_output': pandas_response.pandas_output,
@@ -100,6 +117,7 @@ class CommandService:
                             df_response: DataframeResponse,
                             usage: LLMUsageResponse) -> dict:
         return {
+            'type': df_response.type,
             'pandas_commands': df_response.commands,
             'error_msg': error_msg,
             'usage': usage.model_dump()
