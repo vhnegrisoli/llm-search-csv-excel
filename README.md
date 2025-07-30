@@ -186,6 +186,8 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 
 ![Resposta Demo 02](docs/demo_02.png)
 
+---
+
 #### 2. Geração de gráficos
 
 1. **Pergunta**
@@ -195,6 +197,8 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 2. **Resposta**
 
 ![Resposta Demo 04](docs/demo_04.png)
+
+---
 
 #### 3. Vídeo demonstrativo
 
