@@ -28,18 +28,35 @@ pip install -r requirements.txt
 
 ---
 
-## ▶️ Como rodar
+## ▶️ Como rodar a API
 
 ```bash
-uvicorn src.main:app --reload
+uvicorn app:app --reload
 ```
 
 Acesse a documentação interativa em:
 👉 [http://localhost:8000/docs](http://localhost:8000/docs)
 
+API Docs
+
+![Docs](docs/api_docs.png)
+
+## ▶️ Como rodar o front-end com Streamlit
+
+```bash
+streamlit run frontend/streamlit_app.py
+```
+
+Acesse a aplicação interativa em:
+👉 [http://localhost:8501](http://localhost:8501)
+
+Página inicial
+
+![Pergunta Demo 01](docs/demo_01.png)
+
 ---
 
-## 🧠 Funcionalidades
+## 🧠 Funcionalidades da API
 
 ### 🔍 `/api/search`
 
@@ -61,6 +78,7 @@ Executa uma consulta em uma planilha já enviada, interpretando a requisição c
 
 ```json
 {
+  "type": "TEXT",
   "image_path": null,
   "pandas_commands": [
     "df[(df['YEAR_ID'] == 2003) & (df['MONTH_ID'] == 5)]['SALES'].mean()"
@@ -155,6 +173,34 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 ```
 
 ---
+
+### Demonstrações
+
+#### 1. Análises textuais do dataset
+
+1. **Pergunta**
+
+![Pergunta Demo 01](docs/demo_01.png)
+
+2. **Resposta**
+
+![Resposta Demo 02](docs/demo_02.png.png)
+
+#### 2. Geração de gráficos
+
+1. **Pergunta**
+
+![Pergunta Demo 03](docs/demo_03.png)
+
+2. **Resposta**
+
+![Resposta Demo 04](docs/demo_04.png)
+
+#### 3. Vídeo demonstrativo
+
+<video width="1920" height="1080" controls>
+  <source src="docs/demo_video.mp4" type="video/mp4">
+</video>
 
 ## 📄 Licença
 

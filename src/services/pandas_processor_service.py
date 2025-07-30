@@ -35,13 +35,13 @@ class PandasProcessorService:
             try:
                 if self._is_expression(command):
                     result = eval(command, {"__builtins__": {}}, self._local_vars)
-                    results.append(f"Pandas output {i}: {result}")
+                    results.append(f"* Pandas output {i}: {result}")
                 else:
                     exec(command, self._local_vars)
             except Exception as ex:
                 results.append(f"{command} = ERROR: {ex}")
 
-        pandas_output = "\n".join(results)
+        pandas_output = "\n\n".join(results)
 
         print(f'\nPandas output: {pandas_output}\n')
 
