@@ -184,7 +184,7 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 
 2. **Resposta**
 
-![Resposta Demo 02](docs/demo_02.png.png)
+![Resposta Demo 02](docs/demo_02.png)
 
 #### 2. Geração de gráficos
 
@@ -201,6 +201,8 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 <video width="1920" height="1080" controls>
   <source src="docs/demo_video.mp4" type="video/mp4">
 </video>
+
+---
 
 ## 📄 Licença
 
