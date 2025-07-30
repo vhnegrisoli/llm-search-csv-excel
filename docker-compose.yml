@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  llm-search-csv-excel-api:
+    container_name: llm-search-csv-excel-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OPENAI_KEY=${OPENAI_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL}
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+  streamlit-front-end:
+    container_name: streamlit-front-end
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+      - API_BASE_URL=http://llm-search-csv-excel-api:8000
+      - API_STATIC_URL=http://localhost:8000
+    command: streamlit run /app/streamlit_app.py --server.address=0.0.0.0

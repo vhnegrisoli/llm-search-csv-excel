@@ -18,17 +18,49 @@ Ideal para análises automatizadas de dados, visualização e exploração de in
 
 ## 📦 Instalação
 
+Tem duas formas de instalar e rodar o projeto:
+
+1. Manualmente através de um ambiente virtual, instalação de dependências e execução dos projetos
+2. Via docker-compose
+
+---
+
+### 01. Variáveis de ambiente
+
+Crie um arquivo .env na raiz do projeto e preencha as variáveis abaixo com suas respectivas keys:
+
+```
+OPENAI_KEY=sk-...
+OPENAI_MODEL=gpt-4o-mini
+AZURE_OPENAI_KEY=key
+AZURE_OPENAI_URL=https://{your-azure-host}.openai.azure.com/
+AZURE_OPENAI_MODEL=o4-mini
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
+```
+
+---
+
+### 02. Instalação e execução manual
+
 ```bash
 git clone https://github.com/seu-usuario/seu-repo.git
 cd seu-repo
 python -m venv venv
 source venv/bin/activate  # ou venv\Scripts\activate no Windows
 pip install -r requirements.txt
-````
+```
 
 ---
 
-## ▶️ Como rodar a API
+### 03. Instalação via Docker
+
+```bash
+docker-compose up --build -d
+```
+
+### 04. Acessando as aplicações
+
+#### ▶️ Como rodar a API
 
 ```bash
 uvicorn app:app --reload

@@ -8,6 +8,7 @@ load_dotenv()
 
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+API_STATIC_URL = os.getenv("API_STATIC_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Assistente de Planilhas IA", layout="wide")
 st.title("📊 Assistente de Planilhas com IA")
@@ -59,7 +60,7 @@ if "file_name" in st.session_state:
                 if response_type == "TEXT":
                     st.markdown(result["llm_output"])
                 else:
-                    image_url = f"{API_BASE_URL}/{result['image_path']}"
+                    image_url = f"{API_STATIC_URL}/{result['image_path']}"
                     st.image(image_url, width=1000)
                 st.markdown("### 🐼 Comandos Pandas usados")
                 for cmd in result["pandas_commands"]:
