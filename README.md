@@ -71,7 +71,7 @@ Acesse a documentação interativa em:
 
 API Docs
 
-![Docs](docs/api_docs.png)
+![Docs](docs/api_docs.jpg)
 
 ## ▶️ Como rodar o front-end com Streamlit
 
@@ -84,7 +84,7 @@ Acesse a aplicação interativa em:
 
 Página inicial
 
-![Pergunta Demo 01](docs/demo_01.png)
+![Pergunta Demo 01](docs/demo_01.jpg)
 
 ---
 
