@@ -212,11 +212,11 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 
 1. **Pergunta**
 
-![Pergunta Demo 01](docs/demo_01.png)
+![Pergunta Demo 01](docs/demo_01.jpg)
 
 2. **Resposta**
 
-![Resposta Demo 02](docs/demo_02.png)
+![Resposta Demo 02](docs/demo_02.jpg)
 
 ---
 
@@ -224,11 +224,11 @@ Realiza o upload de um arquivo `.csv` ou `.xlsx` para posterior análise.
 
 1. **Pergunta**
 
-![Pergunta Demo 03](docs/demo_03.png)
+![Pergunta Demo 03](docs/demo_03.jpg)
 
 2. **Resposta**
 
-![Resposta Demo 04](docs/demo_04.png)
+![Resposta Demo 04](docs/demo_04.jpg)
 
 ---
 
